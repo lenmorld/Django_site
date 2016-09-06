@@ -1,30 +1,24 @@
 from django.conf.urls import url
 from . import views
 
-#get module called views from current dir
-
 app_name = 'music'
 
+
+# instead of functions, reference class, then convert to view
+
 urlpatterns = [
+    url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name="detail"),
 
-    # /music/
-    url(r'^$', views.index, name='index'),
+    # /music/album/add/  no need for pk for we're creating a new one
+    url(r'album/add/$', views.AlbumCreate.as_view(), name='album-add'),
 
-    # default section - index, or homepage for each app
-    # if nothing is included like music/ , then it will be handled by default here ^$
-    # ^$ matches all, by RegEx
-    # name is optional
+    # /music/album/2/
+    url(r'^album/(?P<pk>[0-9]+)/$', views.AlbumUpdate.as_view(), name='album-update'),
 
-    # /music/<albumID>
-    # e.g. /music/71
+    # /music/album/2/delete
+    url(r'^album/(?P<pk>[0-9]+)/delete/$', views.AlbumDelete.as_view(), name='album-delete'),
 
-    # this will be saved as album_id variable
-    # match digits 0-9, any number, ignore '/'
-    url(r'^(?P<album_id>[0-9]+)/$', views.detail, name="detail" ),
-
-
-    # /music/<album_id>/favorite
-    url(r'^(?P<album_id>[0-9]+)/favorite/$', views.favorite, name="favorite"),
 ]
 
 

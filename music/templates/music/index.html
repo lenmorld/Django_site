@@ -1,16 +1,28 @@
 {% extends 'music/base.html' %}
 
 {% block body %}
-    {% if all_albums %}
+
+    {#    since we are using Generic ListView, the return is 'object_list'#}
+    {#    {% if all_albums %}#}
+
+    {% if object_list %}
         <h3>Lenny's Albums</h3>
         <ul>
-            {% for album in all_albums %}
-
+            {% for album in object_list %}
                 <!-- using hard-coded URLs -->
                 <!--li><a href="/music/{{ album.id }}">{{ album.album_title }}</a></li-->
-
-                <li><a href="{% url 'music:detail' album.id %}">{{ album.album_title }}</a></li>
-
+                <li>
+                    <div class="well">
+                        <a href="{% url 'music:detail' album.id %}">{{ album.album_title }}</a>
+                        <!-- Delete -->
+                        <form action="{% url 'music:album-delete' album.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-default btn-sm">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </form>
+                    </div>
+                </li>
             {% endfor %}
         </ul>
     {% else %}

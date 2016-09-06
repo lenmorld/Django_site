@@ -27,5 +27,5 @@ urlpatterns = [
     url(r'^music/', include('music.urls')),
 
     # anything else, catch localhost:8000 aka homepage
-    url(r'^$', views.home, name="home" )
+    # url(r'^$', views.home, name="home")
 ]

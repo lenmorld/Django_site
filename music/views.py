@@ -1,32 +1,42 @@
+from django.views import generic
 from .models import Album
-from django.shortcuts import render, get_object_or_404
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.core.urlresolvers import reverse_lazy
 
-# Create your views here.
-from django.http import HttpResponse
+# 2 generic views, 1 list, 1 details
+
+class IndexView(generic.ListView):
+    template_name = 'music/index.html'  # whenever we get a list of albums, plug it here
+    context_object_name = 'object_list'  # we can change this
+
+    def get_queryset(self):     # query DB for whatever album we want, this ex. get all
+        return Album.objects.all()
 
 
-def index(request):
-    all_albums = Album.objects.all()
-    return render(request, 'music/index.html', {'all_albums': all_albums})
+class DetailView(generic.DetailView):
+    model = Album
+    template_name = 'music/detail.html'
 
 
-def detail(request, album_id):
-    album = get_object_or_404(Album, pk=album_id)
-    return render(request, 'music/detail.html', {'album': album})
+class AlbumCreate(CreateView):
+    model = Album
+    # fields that we'll allow user to fill out
+    # we can write a crawler that gets logo atuomatically, or fill the genre
+    # for now, we allow user to type everything
+    fields = ['artist', 'album_title', 'genre', 'album_logo']
 
-def favorite(request, album_id):
-    album = get_object_or_404(Album, pk=album_id)
-    try:
-        selected_song = album.song_set.get(pk=request.POST['song'])
-    except (KeyError, Song.DoesNotExist):
-        return render(request, 'music/detail.html',  {
-            'album': album,
-            'error_message' : "You did not select a valid song", })
-    else:
-        selected_song.is_favorite = True
-        selected_song.save()    # store changes to DB
-        return render(request, 'music/detail.html', {'album': album})
+class AlbumUpdate(UpdateView):
+    model = Album
+    fields = ['artist', 'album_title', 'genre', 'album_logo']
 
-# function to catch localhost:8000 aka homepage
-def home(request):
-    return HttpResponse("HOMEPAGE<br/>HOST:" + request.get_host())
+class AlbumDelete(DeleteView):
+    model = Album
+    success_url = reverse_lazy('music:index')
+
+
+# def home(request):
+#     return HttpResponse("HOMEPAGE<br/>HOST:" + request.get_host())
+
+
+
+
