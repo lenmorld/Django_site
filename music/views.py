@@ -2,6 +2,10 @@ from django.views import generic
 from .models import Album
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.views.generic import View
+from .forms import UserForm
 
 # 2 generic views, 1 list, 1 details
 
@@ -33,6 +37,41 @@ class AlbumDelete(DeleteView):
     model = Album
     success_url = reverse_lazy('music:index')
 
+
+class UserFormView(View):
+    form_class = UserForm
+    template_name = 'music/registration_form.html'
+
+    # display a blank form
+    def get(self, request):
+        form = self.form_class(None)   # no need to pass anything
+        return render(request, self.template_name, {'form': form})
+
+    # process form data
+    def post(self, request):
+        form = self.form_class(request.POST)     # always TRUE when valid data
+
+        if form.is_valid():
+            # creates object on the form, doesn't save to DB yet
+            user = form.save(commit=False)
+
+            # cleaned/normalized data
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user.set_password(password)
+            user.save()
+
+            # returns User objects if credentials are correct
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    # request.user     # to refer to the user
+                    return redirect('music:index')
+
+        # failed login, return to this form
+        return render(request, self.template_name, {'form': form})
 
 # def home(request):
 #     return HttpResponse("HOMEPAGE<br/>HOST:" + request.get_host())

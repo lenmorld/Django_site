@@ -9,7 +9,8 @@ class Album(models.Model):
     artist = models.CharField(max_length=250)
     album_title = models.CharField(max_length=250)
     genre = models.CharField(max_length=100)
-    album_logo = models.CharField(max_length=1000)
+    # album_logo = models.CharField(max_length=1000)
+    album_logo = models.FileField()
 
     # when we create a new album, a pk will be given, pk will be passed to primary view
     # whenever we use the view, we need to pass the pk
