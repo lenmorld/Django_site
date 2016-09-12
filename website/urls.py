@@ -17,7 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-
+from rest_framework.urlpatterns import format_suffix_patterns
 from music import views
 
 urlpatterns = [
@@ -28,6 +28,11 @@ urlpatterns = [
     # anything that starts with music, hop to the urls in music > urls.py
     url(r'^music/', include('music.urls')),
 
+    # REST API
+    url(r'^rest/', views.RESTList.as_view()),
+
+    url(r'^', include('music.urls')),
+
     # anything else, catch localhost:8000 aka homepage
     # url(r'^$', views.home, name="home")
 ]
@@ -36,3 +41,6 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+# urlpatterns = format_suffix_patterns(urlpatterns)
